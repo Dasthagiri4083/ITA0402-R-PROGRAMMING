@@ -1,0 +1,39 @@
+# Load the Iris dataset (it's built-in in R)
+data(iris)
+
+# (i) Find dimension, structure, summary statistics, and standard deviation of all features
+cat("Dimension of the dataset:", dim(iris), "\n")
+str(iris)
+summary(iris)
+cat("Standard Deviation of all features:\n")
+sapply(iris[, 1:4], sd)
+cat("\n")
+
+# (ii) Find mean and standard deviation of features grouped by species
+by_species <- by(iris[, 1:4], iris$Species, colMeans)
+cat("Mean by species:\n")
+print(by_species)
+cat("Standard Deviation by species:\n")
+by(iris[, 1:4], iris$Species, function(x) apply(x, 2, sd))
+cat("\n")
+
+# (iii) Find quantile value of sepal width and length
+quantile(iris$Sepal.Length)
+quantile(iris$Sepal.Width)
+
+# (iv) Create a new data frame named iris1 with a new column Sepal.Length.Cate
+iris$Sepal.Length.Cate <- cut(iris$Sepal.Length, breaks = quantile(iris$Sepal.Length), labels = FALSE)
+iris1 <- iris
+
+# (v) Average value of numerical variables by Species and Sepal.Length.Cate
+aggregate(iris1[, 1:4], by = list(Species = iris1$Species, Sepal.Length.Cate = iris1$Sepal.Length.Cate), FUN = mean)
+
+# (vi) Average mean value of numerical variables by Species and Sepal.Length.Cate
+aggregate(iris1[, 1:4], by = list(Species = iris1$Species, Sepal.Length.Cate = iris1$Sepal.Length.Cate), FUN = function(x) mean(x, na.rm = TRUE))
+
+# (vii) Create a Pivot Table based on Species and Sepal.Length.Cate
+library(dplyr)
+pivot_table <- iris1 %>%
+  group_by(Species, Sepal.Length.Cate) %>%
+  summarise_all(mean)
+print(pivot_table)
